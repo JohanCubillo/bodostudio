@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bodo Studio - Fotografía Profesional</title>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Orbitron:wght@400;700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Lato', sans-serif; background: #0a0a0a; color: #e0e0e0; overflow-x: hidden; }
+
+        header { position: fixed; top: 0; width: 100%; padding: 16px 60px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: rgba(10,10,10,0.92); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .logo img { height: 80px; filter: brightness(0.9) drop-shadow(0 0 6px rgba(255,255,255,0.15)); }
+        nav { display: flex; gap: 48px; }
+        nav a { color: #ccc; text-decoration: none; font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 600; position: relative; transition: color 0.3s; }
+        nav a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: #fff; transition: width 0.3s; }
+        nav a:hover { color: #fff; }
+        nav a:hover::after { width: 100%; }
+
+        .hero { position: relative; height: 100vh; min-height: 700px; display: flex; align-items: center; padding: 0 80px; overflow: hidden; }
+
+        .camera-bg {
+            position: absolute;
+            top: 50%;
+            right: 8%;
+            width: 55%;
+            height: 75%;
+            transform: translateY(-50%);
+            z-index: 1;
+            opacity: 0.7;
+            pointer-events: auto;
+            will-change: opacity, transform;
+        }
+        .camera-bg model-viewer { width: 100%; height: 100%; --poster-color: transparent; background: transparent !important; }
+
+        .hero::before { content: ''; position: absolute; top: 10%; right: 5%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%); border-radius: 50%; z-index: 0; animation: glow-pulse 6s ease-in-out infinite; }
+        @keyframes glow-pulse { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.15); opacity: 0.6; } }
+
+        .hero-content { position: relative; z-index: 10; max-width: 600px; }
+        .hero-content .logo-hero { max-width: 450px; width: 100%; margin-bottom: 32px; filter: drop-shadow(0 8px 30px rgba(255,255,255,0.08)); }
+        .hero-content .subtitle { font-family: 'Playfair Display', serif; font-size: 15px; color: rgba(255,255,255,0.5); margin-bottom: 24px; letter-spacing: 5px; text-transform: uppercase; }
+        .hero-content p { font-size: 16px; line-height: 1.9; color: #999; margin-bottom: 44px; max-width: 480px; }
+        .buttons { display: flex; gap: 16px; }
+        .btn { padding: 14px 36px; border: 1.5px solid rgba(255,255,255,0.4); background: transparent; color: #fff; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94); position: relative; overflow: hidden; border-radius: 2px; }
+        .btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: #fff; z-index: -1; transition: left 0.4s cubic-bezier(0.25,0.46,0.45,0.94); }
+        .btn:hover { color: #0a0a0a; border-color: #fff; box-shadow: 0 0 40px rgba(255,255,255,0.15); }
+        .btn:hover::before { left: 0; }
+        .btn-primary { background: #fff; color: #0a0a0a; border-color: #fff; }
+        .btn-primary::before { background: #0a0a0a; }
+        .btn-primary:hover { color: #fff; background: transparent; }
+
+        .scroll-hint { position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0.4; animation: hint-bob 2s ease-in-out infinite; }
+        .scroll-hint span { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #888; }
+        .scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent); animation: line-drop 2s ease-in-out infinite; }
+        @keyframes hint-bob { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
+        @keyframes line-drop { 0% { opacity: 0; transform: scaleY(0); transform-origin: top; } 50% { opacity: 1; transform: scaleY(1); } 100% { opacity: 0; transform: scaleY(0); transform-origin: bottom; } }
+
+        section { padding: 100px 80px; position: relative; }
+        .section-title { font-family: 'Orbitron', sans-serif; font-size: 48px; font-weight: 900; margin-bottom: 60px; text-align: center; color: #fff; letter-spacing: -1px; }
+
+        #estilos { background: #0f0f0f; overflow: hidden; }
+        #estilos .section-title { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        #estilos.visible .section-title { opacity: 1; transform: translateY(0); }
+        .styles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 32px; }
+        .style-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 48px 36px; text-align: center; border-radius: 12px; transition: all 0.5s cubic-bezier(0.25,0.46,0.45,0.94); position: relative; overflow: hidden; opacity: 0; transform: translateY(60px) scale(0.95); }
+        #estilos.visible .style-card { opacity: 1; transform: translateY(0) scale(1); }
+        #estilos.visible .style-card:nth-child(1) { transition-delay: 0.1s; }
+        #estilos.visible .style-card:nth-child(2) { transition-delay: 0.25s; }
+        #estilos.visible .style-card:nth-child(3) { transition-delay: 0.4s; }
+        #estilos.visible .style-card:nth-child(4) { transition-delay: 0.55s; }
+        .style-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.06) 0%, transparent 60%); opacity: 0; transition: opacity 0.4s; }
+        .style-card:hover::before { opacity: 1; }
+        .style-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-8px) scale(1); box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 40px rgba(255,255,255,0.04); }
+        .style-card-icon { font-size: 52px; margin-bottom: 20px; display: block; }
+        .style-card h3 { font-size: 20px; color: #fff; margin-bottom: 12px; font-family: 'Orbitron', sans-serif; font-weight: 700; letter-spacing: 1px; }
+        .style-card p { color: #777; font-size: 14px; line-height: 1.7; }
+
+        /* Galería Slider */
+        #galeria { background: #0a0a0a; padding: 80px 0; }
+        #galeria .section-title { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; padding: 0 80px; }
+        #galeria.visible .section-title { opacity: 1; transform: translateY(0); }
+
+        .gallery-slider {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 20px 80px 40px;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .gallery-slider::-webkit-scrollbar { display: none; }
+
+        .gallery-item {
+            flex: 0 0 auto;
+            width: 350px;
+            height: 280px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            filter: brightness(0.9);
+        }
+        .gallery-item:hover {
+            border-color: rgba(255,255,255,0.25);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transform: scale(1.02);
+        }
+        .gallery-item:hover img {
+            transform: scale(1.08);
+            filter: brightness(1);
+        }
+
+        /* Slider controls */
+        .slider-controls {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            padding-top: 20px;
+        }
+        .slider-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .slider-btn:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        /* ========== SECCIÓN INFLABLES ========== */
+        #inflables {
+            background: linear-gradient(180deg, #0a0a0a 0%, #0d0a12 50%, #0a0a0a 100%);
+            padding: 100px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decoración de fondo sutil */
+        #inflables::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(147, 112, 219, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float-bubble 8s ease-in-out infinite;
+        }
+        #inflables::after {
+            content: '';
+            position: absolute;
+            bottom: 10%;
+            right: -5%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 182, 193, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float-bubble 6s ease-in-out infinite reverse;
+        }
+        @keyframes float-bubble {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+        }
+
+        #inflables .section-title {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            position: relative;
+            z-index: 2;
+        }
+        #inflables.visible .section-title { opacity: 1; transform: translateY(0); }
+
+        .inflables-subtitle {
+            text-align: center;
+            font-size: 16px;
+            color: rgba(200, 170, 230, 0.7);
+            margin-top: -40px;
+            margin-bottom: 50px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease 0.2s;
+        }
+        #inflables.visible .inflables-subtitle { opacity: 1; transform: translateY(0); }
+
+        .inflables-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .inflable-item {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            cursor: pointer;
+            border: 1px solid rgba(147, 112, 219, 0.2);
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .inflable-item.hidden {
+            display: none;
+        }
+
+        .inflable-item.show {
+            display: block;
+        }
+
+        #inflables.visible .inflable-item {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        #inflables.visible .inflable-item:nth-child(1) { transition-delay: 0.1s; }
+        #inflables.visible .inflable-item:nth-child(2) { transition-delay: 0.2s; }
+        #inflables.visible .inflable-item:nth-child(3) { transition-delay: 0.3s; }
+        #inflables.visible .inflable-item:nth-child(4) { transition-delay: 0.4s; }
+        #inflables.visible .inflable-item:nth-child(5) { transition-delay: 0.5s; }
+        #inflables.visible .inflable-item:nth-child(6) { transition-delay: 0.6s; }
+        #inflables.visible .inflable-item:nth-child(7) { transition-delay: 0.7s; }
+        #inflables.visible .inflable-item:nth-child(8) { transition-delay: 0.8s; }
+        #inflables.visible .inflable-item:nth-child(9) { transition-delay: 0.9s; }
+
+        .inflable-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease, filter 0.4s ease;
+            filter: brightness(0.85);
+        }
+
+        .inflable-item:hover {
+            border-color: rgba(200, 170, 230, 0.5);
+            box-shadow: 
+                0 15px 40px rgba(147, 112, 219, 0.2),
+                0 0 25px rgba(255, 182, 193, 0.1);
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .inflable-item:hover img {
+            transform: scale(1.1);
+            filter: brightness(1);
+        }
+
+        .inflable-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(10, 10, 20, 0.95) 0%, rgba(10, 10, 20, 0.7) 50%, transparent 100%);
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .inflable-item:hover .inflable-overlay {
+            transform: translateY(0);
+        }
+
+        .inflable-overlay h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #fff 0%, rgba(200, 170, 230, 0.9) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .inflable-overlay p {
+            font-size: 13px;
+            color: rgba(200, 180, 220, 0.8);
+            line-height: 1.5;
+        }
+
+        .inflables-cta {
+            text-align: center;
+            margin-top: 50px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease 0.5s;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        #inflables.visible .inflables-cta { opacity: 1; transform: translateY(0); }
+
+        .btn-inflables {
+            padding: 16px 40px;
+            background: linear-gradient(135deg, rgba(147, 112, 219, 0.3) 0%, rgba(255, 182, 193, 0.2) 100%);
+            border: 1.5px solid rgba(200, 170, 230, 0.4);
+            color: #fff;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-inflables::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(147, 112, 219, 0.5) 0%, rgba(255, 182, 193, 0.4) 100%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            border-radius: 50px;
+        }
+        .btn-inflables:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(147, 112, 219, 0.25);
+            border-color: rgba(200, 170, 230, 0.7);
+        }
+        .btn-inflables:hover::before { opacity: 1; }
+        .btn-inflables span { position: relative; z-index: 1; }
+
+        .btn-ver-mas {
+            padding: 16px 40px;
+            background: transparent;
+            border: 1.5px solid rgba(200, 170, 230, 0.3);
+            color: rgba(200, 170, 230, 0.9);
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .btn-ver-mas:hover {
+            background: rgba(147, 112, 219, 0.15);
+            border-color: rgba(200, 170, 230, 0.6);
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(147, 112, 219, 0.15);
+        }
+        .btn-ver-mas.hidden { display: none; }
+
+        /* ========== FIN SECCIÓN INFLABLES ========== */
+
+        footer { background: #050505; color: #e0e0e0; padding: 60px; border-top: 1px solid rgba(255,255,255,0.06); text-align: center; font-size: 12px; }
+        footer .footer-brand { font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 3px; margin-bottom: 12px; }
+        footer .footer-sub { color: #555; font-size: 12px; margin-bottom: 16px; }
+        footer .footer-contact { color: #444; font-size: 12px; }
+
+        @media (max-width: 900px) { 
+            header { padding: 14px 28px; } 
+            nav { gap: 24px; } 
+            .hero { padding: 0 36px; } 
+            .hero-content .logo-hero { max-width: 300px; } 
+            .camera-bg { width: 50%; right: 2%; opacity: 0.4; } 
+            section { padding: 60px 36px; } 
+            .section-title { font-size: 36px; } 
+            .gallery-slider { padding: 20px 36px 40px; }
+            .gallery-item { width: 300px; height: 240px; }
+            #inflables { padding: 60px 36px; }
+        }
+        @media (max-width: 600px) { 
+            header { padding: 12px 20px; } 
+            nav { gap: 16px; } 
+            nav a { font-size: 9px; letter-spacing: 1.5px; } 
+            .logo img { height: 50px; } 
+            .hero { padding: 0 24px; } 
+            .hero-content .logo-hero { max-width: 220px; } 
+            .hero-content .subtitle { font-size: 11px; letter-spacing: 3px; } 
+            .hero-content p { font-size: 14px; } 
+            .camera-bg { width: 60%; right: -5%; opacity: 0.25; } 
+            section { padding: 50px 20px; } 
+            .section-title { font-size: 28px; margin-bottom: 40px; } 
+            .buttons { flex-direction: column; } 
+            .btn { width: 100%; text-align: center; }
+            .gallery-slider { padding: 20px 20px 40px; gap: 12px; }
+            .gallery-item { width: 260px; height: 200px; }
+            #inflables { padding: 50px 20px; }
+            .inflables-subtitle { font-size: 13px; margin-bottom: 30px; }
+            .inflables-gallery { grid-template-columns: 1fr; gap: 16px; }
+            .inflable-overlay { transform: translateY(0); }
+            .inflables-cta { flex-direction: column; gap: 12px; }
+            .btn-inflables, .btn-ver-mas { width: 100%; }
+        }
+        @media (max-width: 900px) {
+            .inflables-gallery { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo"><img src="logo.png" alt="Bodo Studio"></div>
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#estilos">Estilos</a>
+            <a href="#galeria">Galería</a>
+            <a href="#inflables">Inflables</a>
+            <a href="#contacto">Contacto</a>
+        </nav>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="camera-bg" id="cameraBg">
+            <model-viewer
+                id="cameraModel"
+                src="camera2.glb"
+                alt="Professional Camera"
+                auto-rotate
+                rotation-per-second="20deg"
+                camera-orbit="0deg 90deg 8m"
+                interaction-prompt="none"
+                disable-zoom
+            ></model-viewer>
+        </div>
+
+        <div class="hero-content">
+            <img class="logo-hero" src="logo.png" alt="Bodo Studio Logo">
+            <p class="subtitle">Fotografía Profesional</p>
+            <p>Transformamos momentos en historias visuales impactantes. Expertos en fotografía comercial, editorial, eventos de lujo y visualización 3D de clase mundial.</p>
+            <div class="buttons">
+                <button class="btn btn-primary">Explorar Portfolio</button>
+                <button class="btn">Contactar</button>
+            </div>
+        </div>
+
+        <div class="scroll-hint">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <section id="estilos">
+        <h2 class="section-title">NUESTROS ESTILOS</h2>
+        <div class="styles-grid">
+            <div class="style-card"><span class="style-card-icon">📸</span><h3>Retratos</h3><p>Capturas de momentos íntimos que cuentan historias profundas y auténticas.</p></div>
+            <div class="style-card"><span class="style-card-icon">💍</span><h3>Bodas</h3><p>Matrimonios hermosos capturados con precisión, elegancia y romance.</p></div>
+            <div class="style-card"><span class="style-card-icon">🎉</span><h3>Eventos</h3><p>Momentos especiales y celebraciones documentadas con estilo único.</p></div>
+            <div class="style-card"><span class="style-card-icon">👶</span><h3>Bebés</h3><p>Ternura e inocencia de los momentos más preciosos de la vida.</p></div>
+        </div>
+    </section>
+
+    <section id="galeria">
+        <h2 class="section-title">GALERÍA</h2>
+        <div class="gallery-slider" id="gallerySlider"></div>
+        <div class="slider-controls">
+            <button class="slider-btn" onclick="scrollGallery(-1)">❮</button>
+            <button class="slider-btn" onclick="scrollGallery(1)">❯</button>
+        </div>
+    </section>
+
+    <!-- NUEVA SECCIÓN DE INFLABLES -->
+    <section id="inflables">
+        <h2 class="section-title">🎈 INFLABLES & DIVERSIÓN</h2>
+        <p class="inflables-subtitle">¡Haz de tu fiesta un momento inolvidable!</p>
+        
+        <div class="inflables-gallery" id="inflablesGallery">
+            <!-- Las imágenes se cargan dinámicamente -->
+        </div>
+
+        <div class="inflables-cta">
+            <button class="btn-ver-mas" id="btnVerMas" onclick="mostrarMasInflables()"><span>Ver Más 🎪</span></button>
+            <button class="btn-inflables"><span>📞 Reservar Ahora</span></button>
+        </div>
+    </section>
+
+    <footer id="contacto">
+        <p class="footer-brand">© 2024 BODO STUDIO</p>
+        <p class="footer-sub">Fotografía Profesional & Visualización 3D</p>
+        <p class="footer-contact">info@bodostudio.com · +506 8765-4321</p>
+    </footer>
+
+    <script>
+        // Fotos reales de la carpeta fotos/
+        var fotos = [
+            'fotos/506308474_693648776594923_7359481999243944428_n.jpg',
+            'fotos/506907024_692791456680655_2190111510403238674_n.jpg',
+            'fotos/507194736_692788176680983_3169349664716361628_n.jpg',
+            'fotos/572744897_801734919119641_2190010458311158536_n.jpg',
+            'fotos/574572013_801731062453360_3640558971254746894_n.jpg',
+            'fotos/595063494_829450953014704_2769575161832368103_n.jpg',
+            'fotos/605590332_844440224849110_8890227255390076691_n.jpg',
+            'fotos/606992825_844435804849552_3988808036130656006_n.jpg',
+            'fotos/617465901_861498003143332_2710506214968967570_n.jpg',
+            'fotos/618479547_861500199809779_1765721733810638916_n.jpg',
+            'fotos/618699498_17915478105279895_2227795747309419666_n.jpeg',
+            'fotos/619212929_17915861337279895_1902482287843309926_n.jpeg',
+            'fotos/cumpleaños.jpg',
+            'fotos/retrato.jpg'
+        ];
+
+        var slider = document.getElementById('gallerySlider');
+        fotos.forEach(function(foto) {
+            var item = document.createElement('div');
+            item.className = 'gallery-item';
+            var img = document.createElement('img');
+            img.src = foto;
+            img.loading = 'lazy';
+            img.alt = 'Bodo Studio - Fotografía';
+            item.appendChild(img);
+            slider.appendChild(item);
+        });
+
+        // Slider scroll
+        function scrollGallery(dir) {
+            var slider = document.getElementById('gallerySlider');
+            var scrollAmount = 380;
+            slider.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
+        }
+
+        // Section reveal - Agregar #inflables
+        var revealSections = document.querySelectorAll('#estilos, #galeria, #inflables');
+        var obs = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+        revealSections.forEach(function(sec) { obs.observe(sec); });
+
+        // Camera scroll effect - MÁS SUAVE
+        var cameraBg = document.getElementById('cameraBg');
+        var cameraModel = document.getElementById('cameraModel');
+        var heroH = window.innerHeight;
+
+        function onScroll() {
+            var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+            var progress = Math.min(scrollY / (heroH * 0.6), 1);
+            
+            // Ease out quad - más suave
+            var eased = 1 - Math.pow(1 - progress, 2);
+            
+            // Valores más suaves
+            var opacity = 0.7 - (eased * 0.7);
+            var rotate = eased * 180;
+            var moveX = eased * 300;
+            var moveY = -50 + (eased * -20);
+            var scale = 1 - (eased * 0.5);
+            
+            cameraBg.style.opacity = Math.max(opacity, 0);
+            cameraBg.style.transform = 'translateY(' + moveY + '%) translateX(' + moveX + 'px) scale(' + scale + ') rotate(' + rotate + 'deg)';
+            
+            // Acelerar rotación del modelo 3D
+            if (cameraModel) {
+                var speed = 20 + (eased * 150);
+                cameraModel.setAttribute('rotation-per-second', speed + 'deg');
+            }
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        // ========== INFLABLES GALLERY ==========
+        var inflables = [
+            { img: 'inflables/castillo.jpg', nombre: 'Castillo Mágico', desc: 'El clásico favorito de los niños' },
+            { img: 'inflables/tobogan.jpg', nombre: 'Tobogán Gigante', desc: 'Diversión desde las alturas' },
+            { img: 'inflables/combo.jpg', nombre: 'Combo Aventura', desc: 'Castillo + tobogán + obstáculos' },
+            { img: 'inflables/acuatico.jpg', nombre: 'Acuático Splash', desc: 'Perfecto para días calurosos' },
+            { img: 'inflables/cancha.jpg', nombre: 'Cancha Inflable', desc: 'Fútbol y más deportes' },
+            { img: 'inflables/mini.jpg', nombre: 'Mini Parque', desc: 'Ideal para los más pequeños' },
+            { img: 'inflables/obstaculo.jpg', nombre: 'Carrera Obstáculos', desc: 'Competencia y diversión' },
+            { img: 'inflables/princesa.jpg', nombre: 'Castillo Princesa', desc: 'Para las pequeñas soñadoras' },
+            { img: 'inflables/futbol.jpg', nombre: 'Arena Fútbol', desc: 'Partidos épicos garantizados' }
+        ];
+
+        var inflablesGallery = document.getElementById('inflablesGallery');
+        var mostrandoTodos = false;
+        var INICIAL = 3;
+
+        function renderInflables() {
+            inflablesGallery.innerHTML = '';
+            inflables.forEach(function(item, index) {
+                var div = document.createElement('div');
+                div.className = 'inflable-item' + (index >= INICIAL && !mostrandoTodos ? ' hidden' : '');
+                div.innerHTML = 
+                    '<img src="' + item.img + '" alt="' + item.nombre + '" loading="lazy">' +
+                    '<div class="inflable-overlay">' +
+                        '<h3>' + item.nombre + '</h3>' +
+                        '<p>' + item.desc + '</p>' +
+                    '</div>';
+                inflablesGallery.appendChild(div);
+            });
+        }
+
+        function mostrarMasInflables() {
+            mostrandoTodos = true;
+            var items = document.querySelectorAll('.inflable-item');
+            items.forEach(function(item, index) {
+                if (index >= INICIAL) {
+                    item.classList.remove('hidden');
+                    item.classList.add('show');
+                    // Forzar animación
+                    setTimeout(function() {
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateY(0) scale(1)';
+                    }, (index - INICIAL) * 100);
+                }
+            });
+            document.getElementById('btnVerMas').classList.add('hidden');
+        }
+
+        renderInflables();
+    </script>
+</body>
+</html>

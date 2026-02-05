@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: bodo_studio_db
+    environment:
+      POSTGRES_USER: bodo_user
+      POSTGRES_PASSWORD: bodo_password
+      POSTGRES_DB: bodo_studio_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bodo_network
+
+  app:
+    build: .
+    container_name: bodo_studio_app
+    ports:
+      - "8080:3000"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://bodo_user:bodo_password@postgres:5432/bodo_studio_db
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - bodo_network
+    command: npm start
+
+volumes:
+  postgres_data:
+
+networks:
+  bodo_network:
+    driver: bridge
