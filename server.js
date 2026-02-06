@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
@@ -6,16 +7,16 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 
 const app = express();
-const PORT = 3001;
-const JWT_SECRET = 'bodo_studio_secret_key_2024';
+const PORT = process.env.PORT || 3001;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Configuración de PostgreSQL
 const pool = new Pool({
-    host: '18.215.154.82',
-    port: 5432,
-    database: 'ia_analytics',
-    user: 'db_2_readwrite',
-    password: '0AQRT0wGfsora3ld5udN5NhfssQbr9oZ',
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     ssl: false
 });
 
