@@ -1,0 +1,17 @@
+    .maquinas-grid { 
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding-bottom: 10px;
+    }
+    
+    .maquinas-grid::-webkit-scrollbar { display: none; }
+    
+    .maquina-card { 
+        flex: 0 0 auto;
+        width: 85vw;
+        max-width: 350px;
+    }
